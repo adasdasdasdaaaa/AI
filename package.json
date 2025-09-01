@@ -1,10 +1,9 @@
 {
   "name": "sandbox-ai",
   "version": "1.0.0",
-  "description": "Self-autonomous AI sandbox",
-  "main": "server/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server/index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
