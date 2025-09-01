@@ -1,12 +1,14 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static('../client')); // フロント配信
+// クライアント配信
+app.use(express.static(path.join(__dirname, 'client')));
 
 // ----------------- AI定義 -----------------
 class AICharacter {
@@ -16,7 +18,7 @@ class AICharacter {
         this.hunger = 100;
         this.resources = { wood: 0, stone: 0 };
         this.inventory = { sword: 0, shield: 0 };
-        this.relationships = {}; // name: value
+        this.relationships = {};
         this.allies = [];
         this.enemy = null;
         this.x = Math.floor(Math.random() * 50);
@@ -24,30 +26,20 @@ class AICharacter {
     }
 
     decideAction(world, others) {
-        // 空腹なら資源集め
         if (this.hunger < 50) return 'gather';
-
-        // 敵がいるなら攻撃
         if (this.enemy) return 'attack';
 
-        // 友好的な相手を見つければチャットして同盟
         const friend = others.find(o => !this.allies.includes(o.name) && o.name !== this.name);
         if (friend && Math.random() < 0.3) return { type: 'chat', target: friend.name };
 
-        // 敵がいない場合、敵をランダムに設定
         const potentialEnemy = others.find(o => o.name !== this.name && !this.allies.includes(o.name));
-        if(potentialEnemy && Math.random() < 0.1){
-            this.enemy = potentialEnemy.name;
-            return 'attack';
-        }
+        if (potentialEnemy && Math.random() < 0.1) this.enemy = potentialEnemy.name;
 
-        // ランダムに探索
         return 'explore';
     }
 
     performAction(action, world, others) {
         if(action === 'gather') {
-            // ランダム資源取得
             const r = Math.random() < 0.5 ? 'wood' : 'stone';
             this.resources[r] += 1;
             this.hunger += 10;
@@ -113,4 +105,6 @@ setInterval(()=>{
     })));
 }, 1000);
 
-server.listen(process.env.PORT || 3000, ()=>console.log("Server running"));
+// ポート設定
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, ()=>console.log(`Server running on port ${PORT}`));
