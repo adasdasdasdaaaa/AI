@@ -12,7 +12,6 @@ socket.on('worldUpdate', data => {
 
 function drawWorld() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    // 背景
     ctx.fillStyle = '#cceeff';
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
